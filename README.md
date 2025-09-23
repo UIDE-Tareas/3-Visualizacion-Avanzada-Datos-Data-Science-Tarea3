@@ -1,10 +1,9 @@
-# 3-Visualizacion-Avanzada-Datos-Data-Science-Tarea3
 <div style="display: table; width: 100%;">
   <div style="display: table-cell; text-align: center; vertical-align: middle; width: 70%;">
     <h1>Visualización Avanzada de Datos en Data Science</h1>
   </div>
   <div style="display: table-cell; text-align: center; vertical-align: middle; width: 30%;">
-    <img src="https://raw.githubusercontent.com/UIDE-Tareas/3-Visualizacion-Avanzada-Datos-Data-Science-Tarea3/refs/heads/main/assets/UideLogo.png" alt="logo UIDE" style="width:50%;">
+    <img src="https://github.com/UIDE-Tareas/3-Visualizacion-Avanzada-Datos-Data-Science-Tarea3/blob/main/Assets/UideLogo.png?raw=true" alt="logo UIDE" style="width:50%;">
   </div>
 </div>
 <hr />
@@ -73,6 +72,10 @@ Cada servidor de dashboard Flask/Dash se ejecuta con un puerto específico con e
 Para ver el respectivo dashboard, dar click en Navegar. Esto abre el navegador en una url http://host:port
 
 Para detener el servidor Flask/Dash del dashboard, dar click en Detener
+
+![Windows App](https://github.com/UIDE-Tareas/3-Visualizacion-Avanzada-Datos-Data-Science-Tarea3/blob/main/Screenshots/WindowsApp.png?raw=true)
+
+![Linux App](https://github.com/UIDE-Tareas/3-Visualizacion-Avanzada-Datos-Data-Science-Tarea3/blob/main/Screenshots/LinuxApp.png?raw=true)
 
 
 #### App.py 
