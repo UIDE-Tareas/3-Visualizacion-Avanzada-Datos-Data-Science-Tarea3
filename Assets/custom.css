@@ -1,0 +1,16 @@
+@keyframes pulse {
+  0% { transform: scale(1); opacity:.75;}
+  50% { transform: scale(1.35); opacity:1;}
+  100% { transform: scale(1); opacity:.75;}
+}
+.pulse-dot {
+  display:inline-block; width:8px; height:8px; border-radius:50%;
+  background:#ffca2c; margin-left:8px; animation:pulse 1.4s infinite;
+  box-shadow: 0 0 0 2px rgba(255,202,44,.25);
+}
+
+/* Opcional: que el botón guía “resalte” un poco más */
+#btn-help.btn-warning { font-weight: 600; }
+
+/* Plotly: fondo claro consistente */
+.plotly_white { background: #fff; }
