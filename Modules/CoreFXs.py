@@ -110,17 +110,26 @@ def ShowNanValues(df: pandas.DataFrame):
 
 
 # Función para descargar un archivo
-def DownloadFile(uri: str, filename: str):
-    display(f"ℹ️ Descargando \"{uri}\"")
+def DownloadFile(uri: str, filename: str, overwrite: bool = False, timeout: int = 20):
+    dest = Path(filename).resolve()
+    if dest.exists() and dest.is_file() and dest.stat().st_size > 0 and not overwrite:
+        display(f"✅ Ya existe: \"{dest}\". No se descarga (use overwrite=True para forzar).")
+        return
+    if dest.parent and not dest.parent.exists():
+        dest.parent.mkdir(parents=True, exist_ok=True)
+    display(f"ℹ️ Descargando \"{uri}\" → \"{dest}\"")
     try:
-        os.makedirs(os.path.dirname(filename), exist_ok=True)
-        respuesta = requests.get(uri)
-        respuesta.raise_for_status() 
-        with open(filename, 'wb') as archivo:
-            archivo.write(respuesta.content)
-        display(f"archivo \"{filename}\" fue descargado exitosamente.")
+        with requests.get(uri, stream=True, timeout=timeout) as resp:
+            resp.raise_for_status()
+            tmp = dest.with_suffix(dest.suffix + ".part")
+            with open(tmp, "wb") as f:
+                for chunk in resp.iter_content(chunk_size=1024 * 64):
+                    if chunk:  # filtra keep-alive chunks
+                        f.write(chunk)
+            tmp.replace(dest)
+        display(f"✅ Archivo \"{dest}\" descargado exitosamente.")
     except requests.exceptions.RequestException as e:
-        display(f"Error downloading file: {e}")
+        display(f"❌ Error al descargar: {e}")
 
 # Función para descomprimir un archivo zip
 def UnzipFile(filename: str, outputDir: str):
