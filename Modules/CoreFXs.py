@@ -1,3 +1,4 @@
+from enum import Enum
 import sys
 import subprocess
 import argparse
@@ -47,11 +48,11 @@ import requests
 import zipfile
 import gzip
 import shutil
-
+    
 # Función para mostrar mensajes de información.
-def ShowInfoMessage(message: str):
+def ShowWarningMessage(message: str):
     display()
-    display(f"ℹ️ {message}".upper())
+    display(f"⚠️ {message}".upper())
 
 # Función para mostrar la información del DataFrame.
 def ShowTableInfo(df:pandas.DataFrame, title):
@@ -164,3 +165,36 @@ def PrintAssert(message: str, boolExpression: bool):
         print(f"{VERDE}✅ {message}{RESET}")
     else:
         print(f"{ROJO}🚫 {message}{RESET}")
+
+
+class Color(Enum):
+    RED = "\033[91m"
+    GREEN = "\033[92m"
+    YELLOW = "\033[93m"
+    BLUE = "\033[94m"
+    MAGENTA = "\033[95m"
+    CYAN = "\033[96m"
+    WHITE = "\033[97m"
+    RESET = "\033[0m"
+
+def PrintColor(message: str, color: Color) -> str:
+    """Devuelve un texto coloreado con ANSI (sin imprimir)."""
+    RESET = Color.RESET.value
+    return f"{color.value}{message}{RESET}"
+
+def ShowMessage(message: str, title: str, icon: str, color: Color):
+    display()
+    colored_title = PrintColor(title.upper(), color)
+    display(f"{icon} {colored_title}: {message}")
+
+def ShowInfoMessage(message: str, title: str = "Info"):
+    ShowMessage(message, title, "ℹ️", Color.CYAN)
+
+def ShowSuccessMessage(message: str, title: str = "Success"):
+    ShowMessage(message, title, "✅", Color.GREEN)
+
+def ShowErrorMessage(message: str, title: str = "Error"):
+    ShowMessage(message, title, "❌", Color.RED)
+
+def ShowWarningMessage(message: str, title: str = "Warning"):
+    ShowMessage(message, title, "⚠️", Color.YELLOW)

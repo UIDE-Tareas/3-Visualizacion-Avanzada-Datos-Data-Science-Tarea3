@@ -4,6 +4,7 @@ import argparse
 import os
 from pathlib import Path
 import Modules.CoreFXs as CoreFXs
+from IPython.display import display
 
 # AGREGAR LAS REFERENCIAS EXTERNAS AQUÍ EN ESTA LISTA
 LIBS = (
@@ -25,8 +26,10 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from dash import Dash, dcc, html, Input, Output
 import dash_bootstrap_components as dbc
-from IPython.display import display
 
+CoreFXs.ShowWarningMessage("🚀⚠️ En Windows ya viene instalado tkinter. Probar con `python -m tkinter`")
+CoreFXs.ShowWarningMessage("🚀⚠️ En Ubuntu instalar tkinter con `sudo apt install python3-tk`. Probar con `python3 -m tkinter`")
+CoreFXs.ShowWarningMessage("🚀⚠️ En MacOS ya viene instalado tkinter. Probar con `python3 -m tkinter`")
 pandas.set_option("display.max_rows", None) 
 pandas.set_option("display.max_columns", None)
 
@@ -39,7 +42,7 @@ DATA_FILE_URI = "https://github.com/UIDE-Tareas/3-Visualizacion-Avanzada-Datos-D
 DATA_FILENAME = f"{DOWNLOAD_DIR}/clinical_analytics.csv.gz"
 
 CUSTOM_CSS_URI = "https://raw.githubusercontent.com/UIDE-Tareas/3-Visualizacion-Avanzada-Datos-Data-Science-Tarea3/refs/heads/main/Assets/custom.css"
-CUSTOM_CSS_FILENAME = "Assets/custom.css"
+CUSTOM_CSS_FILENAME = "assets/custom.css"
 
 CoreFXs.DownloadFile(DATA_FILE_URI, DATA_FILENAME, overwrite=True)
 CoreFXs.UngzipFile(DATA_FILENAME, "Temp")
@@ -189,13 +192,13 @@ class AppRow:
 class Launcher(ctk.CTk):
     def __init__(self):
         super().__init__()
-        self.title("Launcher simple - customtkinter + Dash")
+        self.title("Visualización Avanzada de Datos en Data Science - Componente práctico 3 - DashBoards")
         self.geometry("820x280")
         ctk.set_appearance_mode("system")
         ctk.set_default_color_theme("blue")
 
         ctk.CTkLabel(
-            self, text="Tres servidores Dash (Ejecutar / Abrir navegador / Detener)",
+            self, text="DashBoards - Clinical Analytics",
             font=("Segoe UI", 16, "bold")
         ).pack(pady=(12, 4))
 
