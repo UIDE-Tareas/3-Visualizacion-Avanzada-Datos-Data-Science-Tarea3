@@ -21,7 +21,7 @@ print(f"Iniciando Host:{args.host}, Port:{args.port}...")
 # =========================
 # CONFIG
 # =========================
-DATA_FILE = Path(r"Temp\clinical_analytics.csv.gz").resolve()
+DATA_FILE = Path(r"Temp/clinical_analytics.csv.gz").resolve()
 ADMIT_SOURCE_STRATEGY = "mode"  # "mode" (completar con más frecuente) o "drop" (eliminar nulos)
 
 # Paleta de colores menos saturada (evita el azul monolítico)
