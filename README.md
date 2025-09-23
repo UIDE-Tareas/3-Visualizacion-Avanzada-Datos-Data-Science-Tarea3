@@ -38,6 +38,9 @@ git clone "https://github.com/UIDE-Tareas/3-Visualizacion-Avanzada-Datos-Data-Sc
 
 Dependiendo de tu plataforma ejecutar el script App, este script permite crear el virtual environment para instalar las dependencias en este entorno y evitar que se instalen en la instalación de Python. Con esto evitamos actualizar o realizar cambios en la instalación general de python sin afectar otros proyectos o instalar dependencias innecesarias.
 
+> **⚠️ WARNING ⚠️**
+> **NO EJECUTAR DIRECTAMENTE `App.py`, esto es con el objetivo de evitar inconvenientes con el entorno o instalación principal de Python** 
+
 ##### Windows
 
 ##### Desde Command Prompt (cmd.exe)

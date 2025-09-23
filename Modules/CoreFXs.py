@@ -109,6 +109,12 @@ def ShowNanValues(df: pandas.DataFrame):
     display(nulls_df)
     display()
 
+def ShowUniqueCounts(df: pandas.DataFrame):
+    ShowInfoMessage("Valores únicos por columna")
+    unique_counts = df.nunique().reset_index()
+    unique_counts.columns = ['Columna', 'CantidadUnicos']
+    display(unique_counts)
+    display()
 
 # Función para descargar un archivo
 def DownloadFile(uri: str, filename: str, overwrite: bool = False, timeout: int = 20):
@@ -184,8 +190,8 @@ def PrintColor(message: str, color: Color) -> str:
 
 def ShowMessage(message: str, title: str, icon: str, color: Color):
     display()
-    colored_title = PrintColor(title.upper(), color)
-    display(f"{icon} {colored_title}: {message}")
+    colored_title = PrintColor(title.upper() + ":", color)
+    display(f"{icon}  {colored_title} {message}")
 
 def ShowInfoMessage(message: str, title: str = "Info"):
     ShowMessage(message, title, "ℹ️", Color.CYAN)
@@ -194,7 +200,7 @@ def ShowSuccessMessage(message: str, title: str = "Success"):
     ShowMessage(message, title, "✅", Color.GREEN)
 
 def ShowErrorMessage(message: str, title: str = "Error"):
-    ShowMessage(message, title, "❌", Color.RED)
+    ShowMessage(message, title, "❌ ", Color.RED)
 
 def ShowWarningMessage(message: str, title: str = "Warning"):
     ShowMessage(message, title, "⚠️", Color.YELLOW)
