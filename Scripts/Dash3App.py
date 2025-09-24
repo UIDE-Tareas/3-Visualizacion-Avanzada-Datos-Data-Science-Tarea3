@@ -207,26 +207,19 @@ def ShowMessage(message: str, title: str, icon: str, color: Color):
         pass
     print()
     colored_title = PrintColor(title.upper() + ":", color)
-    if not _supports_utf8():
-        icon = {
-            "ℹ️": "[i]",
-            "✅": "[OK]",
-            "❌": "[X]",
-            "⚠️": "[!]",
-        }.get(icon, "")
     print(f"{icon}  {colored_title} {message}")
 
 def ShowInfoMessage(message: str, title: str = "Info"):
-    ShowMessage(message, title, "ℹ️", Color.CYAN)
+    ShowMessage(message, title, "[i]", Color.CYAN)
 
 def ShowSuccessMessage(message: str, title: str = "Success"):
-    ShowMessage(message, title, "✅", Color.GREEN)
+    ShowMessage(message, title, "[OK]", Color.GREEN)
 
 def ShowErrorMessage(message: str, title: str = "Error"):
-    ShowMessage(message, title, "❌ ", Color.RED)
+    ShowMessage(message, title, "[X]", Color.RED)
 
 def ShowWarningMessage(message: str, title: str = "Warning"):
-    ShowMessage(message, title, "⚠️", Color.YELLOW)
+    ShowMessage(message, title, "[!]", Color.YELLOW)
 
 
 pandas.set_option("display.max_rows", None)
@@ -299,7 +292,7 @@ def ShowDatasetInfo(df: pandas.DataFrame):
 dataOriginal = LoadDataset()
 dfMain = dataOriginal.copy()
 dfMain = CleanDataset(dfMain)
-ShowDatasetInfo(dfMain)
+# ShowDatasetInfo(dfMain)
 
 
 ###############3
