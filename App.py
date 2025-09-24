@@ -4,20 +4,35 @@ import argparse
 import os
 from pathlib import Path
 import Modules.CoreFXs as CoreFXs
+from Modules.CoreFXs import RunCommand, ShowEnvironmentInfo
 
 # AGREGAR LAS REFERENCIAS EXTERNAS AQUÍ EN ESTA LISTA
 LIBS = (
-
     "plotly",
     "dash",
     "dash-bootstrap-components",
     "ipython",
     "customtkinter",
-    ""
+    "requests",
+    "numpy",
+    "pandas",
+    "seaborn",
+    "matplotlib",
+    "ipython",
 )
 
-CoreFXs.ShowEnvironmentInfo()
-CoreFXs.InstallDeps(LIBS)
+
+def InstallDeps(libs: list[str] = []):
+    print("ℹ️ Installing deps.")
+    RunCommand(
+        [sys.executable, "-m", "pip", "install", "--upgrade", "pip"], printCommand=True
+    )
+    RunCommand([sys.executable, "-m", "pip", "install", *LIBS], printCommand=True)
+    print("Deps installed.")
+
+
+ShowEnvironmentInfo()
+InstallDeps()
 
 import numpy as np
 import pandas as pd
@@ -27,13 +42,20 @@ import matplotlib.pyplot as plt
 from dash import Dash, dcc, html, Input, Output
 import dash_bootstrap_components as dbc
 
-CoreFXs.ShowWarningMessage("🚀⚠️ En Windows ya viene instalado tkinter. Probar con `python -m tkinter`")
-CoreFXs.ShowWarningMessage("🚀⚠️ En Ubuntu instalar tkinter con `sudo apt install python3-tk`. Probar con `python3 -m tkinter`")
-CoreFXs.ShowWarningMessage("🚀⚠️ En MacOS ya viene instalado tkinter. Probar con `python3 -m tkinter`")
-pandas.set_option("display.max_rows", None) 
+CoreFXs.ShowWarningMessage(
+    "🚀⚠️  En WINDOWS ya viene instalado tkinter. Probar con `python -m tkinter`"
+)
+CoreFXs.ShowWarningMessage(
+    "🚀⚠️  En UBUNTU/LINUX instalar tkinter con `sudo apt install python3-tk`. Probar con `python3 -m tkinter`"
+)
+CoreFXs.ShowWarningMessage(
+    "🚀⚠️  En MACOS ya viene instalado tkinter. Probar con `python3 -m tkinter`"
+)
+pandas.set_option("display.max_rows", None)
 pandas.set_option("display.max_columns", None)
 
 import warnings
+
 warnings.filterwarnings("ignore")
 
 DOWNLOAD_DIR = "Temp"
@@ -89,18 +111,29 @@ class AppRow:
         frame = ctk.CTkFrame(master)
         frame.pack(fill="x", padx=10, pady=6)
 
-        ctk.CTkLabel(
-            frame, text=f"{label} • {self.script_path.name} • :{port}"
-        ).grid(row=0, column=0, padx=6, pady=6, sticky="w")
+        ctk.CTkLabel(frame, text=f"{label} • {self.script_path.name} • :{port}").grid(
+            row=0, column=0, padx=6, pady=6, sticky="w"
+        )
 
-        self.btn_run = ctk.CTkButton(frame, text="▶ Ejecutar", width=120, command=self.launch)
+        self.btn_run = ctk.CTkButton(
+            frame, text="▶ Ejecutar", width=120, command=self.launch
+        )
 
         self.btn_open = ctk.CTkButton(
-            frame, text="🌐 Navegar", width=170, state="disabled", command=self.open_browser
+            frame,
+            text="🌐 Navegar",
+            width=170,
+            state="disabled",
+            command=self.open_browser,
         )
         self.btn_stop = ctk.CTkButton(
-            frame, text="■ Detener", width=150, fg_color="indianred3", hover_color="indianred4",
-            state="disabled", command=self.stop_clicked
+            frame,
+            text="■ Detener",
+            width=150,
+            fg_color="indianred3",
+            hover_color="indianred4",
+            state="disabled",
+            command=self.stop_clicked,
         )
 
         self.btn_run.grid(row=0, column=1, padx=6)
@@ -120,15 +153,25 @@ class AppRow:
             return
 
         python_exe = sys.executable
-        args = [python_exe, str(self.script_path), "--host", HOST, "--port", str(self.port)]
-
+        args = [
+            python_exe,
+            str(self.script_path),
+            "--host",
+            HOST,
+            "--port",
+            str(self.port),
+        ]
         try:
+            env = dict(os.environ, PYTHONUTF8="1", PYTHONIOENCODING="utf-8")
             self.proc = subprocess.Popen(
                 args,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
                 text=True,
-                **creation_kwargs()
+                encoding="utf-8",  
+                bufsize=1,
+                env=env,
+                ** creation_kwargs(),
             )
         except Exception as e:
             print(f"[{self.label}] Error al iniciar: {e}")
@@ -192,14 +235,15 @@ class AppRow:
 class Launcher(ctk.CTk):
     def __init__(self):
         super().__init__()
-        self.title("Visualización Avanzada de Datos en Data Science - Componente práctico 3 - DashBoards")
+        self.title(
+            "Visualización Avanzada de Datos en Data Science - Componente práctico 3 - DashBoards"
+        )
         self.geometry("820x280")
         ctk.set_appearance_mode("system")
         ctk.set_default_color_theme("blue")
 
         ctk.CTkLabel(
-            self, text="DashBoards - Clinical Analytics",
-            font=("Segoe UI", 16, "bold")
+            self, text="DashBoards - Clinical Analytics", font=("Segoe UI", 16, "bold")
         ).pack(pady=(12, 4))
 
         self.rows = []
