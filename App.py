@@ -13,7 +13,8 @@ LIBS = (
     "dash",
     "dash-bootstrap-components",
     "ipython",
-    "customtkinter"
+    "customtkinter",
+    ""
 )
 
 CoreFXs.ShowEnvironmentInfo()
@@ -112,11 +113,11 @@ class AppRow:
 
     def launch(self):
         if self.proc and self.proc.poll() is None:
-            display(f"[{self.label}] Ya está en marcha en el puerto {self.port}.")
+            print(f"[{self.label}] Ya está en marcha en el puerto {self.port}.")
             return
 
         if not self.script_path.exists():
-            display(f"[{self.label}] No se encontró: {self.script_path}")
+            print(f"[{self.label}] No se encontró: {self.script_path}")
             return
 
         python_exe = sys.executable
@@ -131,13 +132,13 @@ class AppRow:
                 **creation_kwargs()
             )
         except Exception as e:
-            display(f"[{self.label}] Error al iniciar: {e}")
+            print(f"[{self.label}] Error al iniciar: {e}")
             return
         self.btn_run.configure(state="disabled")
         self.btn_open.configure(state="normal")
         self.btn_stop.configure(state="normal")
 
-        display(f"[{self.label}] Iniciado en el puerto {self.port}.")
+        print(f"[{self.label}] Iniciado en el puerto {self.port}.")
         threading.Thread(target=self._watch, daemon=True).start()
 
     def _watch(self):
