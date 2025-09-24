@@ -1,10 +1,8 @@
 import sys
 import subprocess
-import argparse
 import os
 from pathlib import Path
-import Modules.CoreFXs as CoreFXs
-from Modules.CoreFXs import RunCommand, ShowEnvironmentInfo
+
 
 # AGREGAR LAS REFERENCIAS EXTERNAS AQUÍ EN ESTA LISTA
 LIBS = (
@@ -30,10 +28,35 @@ def InstallDeps(libs: list[str] = []):
     RunCommand([sys.executable, "-m", "pip", "install", *LIBS], printCommand=True)
     print("Deps installed.")
 
+def RunCommand(
+    commandList: list[str], printCommand: bool = True, printError: bool = True
+) -> subprocess.CompletedProcess:
+    print("⏳", " ".join(commandList))
+    stdOutput = None if printCommand else subprocess.DEVNULL
+    errorOutput = None if printError else subprocess.PIPE
+    result = subprocess.run(
+        commandList, stdout=stdOutput, stderr=errorOutput, text=True
+    )
+    if result.returncode != 0 and printError:
+        print(result.stderr)
+    return result
 
+
+def ShowEnvironmentInfo():
+    print("ℹ️  Environment Info:")
+    print("Python Version:", sys.version)
+    print("Platform:", sys.platform)
+    print("Executable Path:", sys.executable)
+    print("Current Working Directory:", os.getcwd())
+    print("VIRTUAL_ENV:", os.environ.get("VIRTUAL_ENV"))
+    print("sys.prefix:", sys.prefix)
+    print("sys.base_prefix:", sys.base_prefix)
+    
 ShowEnvironmentInfo()
 InstallDeps()
 
+import Modules.CoreFXs as CoreFXs
+from Modules.CoreFXs import RunCommand, ShowEnvironmentInfo
 import numpy as np
 import pandas as pd
 import pandas

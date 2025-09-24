@@ -54,28 +54,28 @@ def ShowTableInfo(df: pandas.DataFrame, title):
 
 # Función para mostrar las n primeras filas del DataFrame.
 def ShowTableHead(df: pandas.DataFrame, title: str, headQty=10):
-    print(f"ℹ️ {title.upper()}: Primeros {headQty} elementos.")
+    print(f"ℹ️  {title.upper()}: Primeros {headQty} elementos.")
     print(df.head(headQty))
     print()
 
 
 # Función para mostrar las n últimas filas del DataFrame.
 def ShowTableTail(df: pandas.DataFrame, title: str, tailQty=10):
-    print(f"ℹ️ {title.upper()}: Últimos {tailQty} elementos.")
+    print(f"ℹ️  {title.upper()}: Últimos {tailQty} elementos.")
     print(df.tail(tailQty))
     print()
 
 
 # Mostrar el tamaño del DataFrame
 def ShowTableShape(df: pandas.DataFrame, title: str):
-    print(f"ℹ️ {title.upper()} - Tamaño de los datos")
+    print(f"ℹ️  {title.upper()} - Tamaño de los datos")
     print(f"{df.shape[0]} filas x {df.shape[1]} columnas")
     print()
 
 
 # Función para mostrar la estadística descriptiva de todas las columnas del DataFrame, por tipo de dato.
 def ShowTableStats(df: pandas.DataFrame, title: str = ""):
-    print(f"ℹ️ Estadística descriptiva - {title}".upper())
+    print(f"ℹ️  Estadística descriptiva - {title}".upper())
     numeric_types = ["int64", "float64", "Int64", "Float64"]
     numeric_cols = df.select_dtypes(include=numeric_types)
     if not numeric_cols.empty:
@@ -100,7 +100,7 @@ def ShowTableStats(df: pandas.DataFrame, title: str = ""):
 
 # Función para mostrar los valores nulos o NaN de cada columna en un DataFrame
 def ShowNanValues(df: pandas.DataFrame):
-    print(f"ℹ️ Contador de valores Nulos".upper())
+    print(f"ℹ️  Contador de valores Nulos".upper())
     nulls_count = df.isnull().sum()
     nulls_df = nulls_count.reset_index()
     nulls_df.columns = ["Columna", "Cantidad_Nulos"]
