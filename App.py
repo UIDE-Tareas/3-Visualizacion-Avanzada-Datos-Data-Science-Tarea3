@@ -4,7 +4,6 @@ import argparse
 import os
 from pathlib import Path
 import Modules.CoreFXs as CoreFXs
-from IPython.display import display
 
 # AGREGAR LAS REFERENCIAS EXTERNAS AQUÍ EN ESTA LISTA
 LIBS = (
