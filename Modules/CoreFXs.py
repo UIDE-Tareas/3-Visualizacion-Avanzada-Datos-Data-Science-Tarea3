@@ -48,6 +48,8 @@ def InstallDeps(libs: list[str] = []):
     RunCommand([sys.executable, "-m", "pip", "install",*LIBS, *libs], printCommand=True) 
     print("Deps installed.")
 
+InstallDeps()
+
 import pandas
 import requests
 import zipfile
