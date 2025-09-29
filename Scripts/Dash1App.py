@@ -443,15 +443,54 @@ def update_views(start_date, end_date, dept_vals, status_vals, diag_vals, admit_
     k_none = (f"{(dff['Diagnosis Primary'].eq('None').mean()*100):.1f}%"
               if "Diagnosis Primary" in dff.columns and len(dff) else "—")
 
-    # Serie temporal: atenciones únicas por día
+   # Serie temporal: área apilada por clínica (encounters únicos por día y clínica)
     if date_col and dff_enc[date_col].notna().any():
-        ts = dff_enc.copy()
-        ts["__date__"] = pd.to_datetime(ts[date_col], errors="coerce")
-        ts = ts.dropna(subset=["__date__"])
-        ts = ts.groupby(ts["__date__"].dt.to_period("D")).size().rename("encounters").to_timestamp()
-        fig_ts = px.line(ts, x=ts.index, y="encounters", title="Atenciones por día (encounters únicos)")
-        fig_ts.update_traces(line_color=COLOR_SEQ[0])  # color suave para la línea
-        fig_ts.update_layout(xaxis_title="Fecha", yaxis_title="# Atenciones", template="plotly_white")
+        if "Clinic Name" in dff_enc.columns:
+            ts = dff_enc.copy()
+            ts["__date__"] = pd.to_datetime(ts[date_col], errors="coerce")
+            ts = ts.dropna(subset=["__date__"])
+            # Contar encounters únicos por día y clínica
+            grp = (ts.dropna(subset=["Clinic Name"])
+                     .groupby([ts["__date__"].dt.to_period("D"), "Clinic Name"])
+                     .agg(encounters=("Encounter Number", pd.Series.nunique) if "Encounter Number" in ts.columns else ("Clinic Name", "size"))
+                     .reset_index())
+            grp["__date__"] = grp["__date__"].dt.to_timestamp()
+
+            if grp.empty:
+                fig_ts = go.Figure(); fig_ts.update_layout(title_text="Sin datos para los filtros seleccionados", template="plotly_white")
+            else:
+                # Limitar a TOP N clínicas (evitamos leyendas infinitas)
+                TOP_N = 10
+                top_clinics = (grp.groupby("Clinic Name")["encounters"].sum()
+                                  .sort_values(ascending=False)
+                                  .head(TOP_N).index.tolist())
+                grp["Clinic Name"] = grp["Clinic Name"].where(grp["Clinic Name"].isin(top_clinics), other="Otros")
+
+                # Reagrupar después de reasignar "Otros"
+                grp = (grp.groupby(["__date__", "Clinic Name"], as_index=False)["encounters"].sum())
+
+                fig_ts = px.area(
+                    grp, x="__date__", y="encounters", color="Clinic Name",
+                    color_discrete_sequence=COLOR_SEQ,
+                    title="Atenciones por día — área apilada por clínica (encounters únicos)"
+                )
+                fig_ts.update_layout(
+                    template="plotly_white",
+                    xaxis_title="Fecha", yaxis_title="# Atenciones",
+                    legend_title_text="Clínica",
+                    hovermode="x unified"
+                )
+        else:
+            ts = dff_enc.copy()
+            ts["__date__"] = pd.to_datetime(ts[date_col], errors="coerce")
+            ts = ts.dropna(subset=["__date__"])
+            ts = (ts.groupby(ts["__date__"].dt.to_period("D"))
+                    .agg(encounters=("Encounter Number", pd.Series.nunique) if "Encounter Number" in ts.columns else ("__date__", "size"))
+                    .rename("encounters")
+                    .to_timestamp())
+            fig_ts = px.line(ts, x=ts.index, y="encounters", title="Atenciones por día (encounters únicos)")
+            fig_ts.update_traces(line_color=COLOR_SEQ[0])
+            fig_ts.update_layout(xaxis_title="Fecha", yaxis_title="# Atenciones", template="plotly_white")
     else:
         fig_ts = go.Figure(); fig_ts.update_layout(title_text="Sin columna de fecha válida", template="plotly_white")
 

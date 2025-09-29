@@ -220,6 +220,33 @@ app.layout = dbc.Container(
                 dbc.Col(
                     dbc.Card(
                         dbc.CardBody(
+                            [
+                                html.H6("Serie temporal por Clínica"),
+                                dcc.Graph(id="FigTimeByClinic"),
+                            ]
+                        )
+                    ),
+                    md=6,
+                ),
+                dbc.Col(
+                    dbc.Card(
+                        dbc.CardBody(
+                            [
+                                html.H6("Serie temporal por Origen de admisión"),
+                                dcc.Graph(id="FigTimeByAdmit"),
+                            ]
+                        )
+                    ),
+                    md=6,
+                ),
+            ],
+            className="g-3 mt-2",
+        ),
+        dbc.Row(
+            [
+                dbc.Col(
+                    dbc.Card(
+                        dbc.CardBody(
                             [html.H6("Clínicas"), dcc.Graph(id="FigClinicNames")]
                         )
                     ),
@@ -255,6 +282,97 @@ app.layout = dbc.Container(
     ],
     fluid=True,
 )
+
+def GetTimeSeriesFig(df_src: pandas.DataFrame, category_col: str, title: str, topn: int = 8):
+    if df_src.empty or category_col not in df_src.columns:
+        fig = px.line(title=f"Sin datos de {title}")
+        fig.update_layout(plot_bgcolor="#222831", paper_bgcolor="#393E46")
+        return fig
+
+    # Tomamos solo fecha (día) de CheckInTime
+    df_tmp = df_src.copy()
+    df_tmp["Fecha"] = df_tmp["CheckInTime"].dt.date
+
+    # Top N categorías dentro del rango por volumen total
+    top_cats = (
+        df_tmp[category_col]
+        .fillna("Desconocido")
+        .astype(str)
+        .value_counts()
+        .head(topn)
+        .index.tolist()
+    )
+    df_tmp[category_col] = df_tmp[category_col].fillna("Desconocido").astype(str)
+    df_tmp = df_tmp[df_tmp[category_col].isin(top_cats)]
+
+    # Conteo por día y categoría
+    g = (
+        df_tmp.groupby(["Fecha", category_col], as_index=False)
+        .size()
+        .rename(columns={"size": "Count"})
+    )
+
+    if g.empty:
+        fig = px.line(title=f"Sin datos de {title}")
+        fig.update_layout(plot_bgcolor="#222831", paper_bgcolor="#393E46")
+        return fig
+
+    fig = px.line(
+        g,
+        x="Fecha",
+        y="Count",
+        color=category_col,
+        markers=True,
+        title=title,
+        template="plotly_dark",
+    )
+    fig.update_layout(
+        hovermode="x unified",
+        plot_bgcolor="#222831",
+        paper_bgcolor="#393E46",
+        xaxis_title="Fecha",
+        yaxis_title="Atenciones",
+        legend_title=category_col,
+    )
+    return fig
+
+@app.callback(
+    Output("FigTimeByClinic", "figure"),
+    Output("FigTimeByAdmit", "figure"),
+    Input("SelectDateRange", "start_date"),
+    Input("SelectDateRange", "end_date"),
+)
+def UpdateTimeSeries(start_date, end_date):
+    # Si no hay fechas, devolvemos figuras vacías pero con estilo
+    if not start_date or not end_date:
+        empty1 = px.line(title="Sin rango de fechas seleccionado (Clínica)")
+        empty1.update_layout(plot_bgcolor="#222831", paper_bgcolor="#393E46")
+        empty2 = px.line(title="Sin rango de fechas seleccionado (Origen de admisión)")
+        empty2.update_layout(plot_bgcolor="#222831", paper_bgcolor="#393E46")
+        return empty1, empty2
+
+    # Filtrado inclusivo por CheckInTime en dfMain (source solicitado)
+    start_dt = pandas.to_datetime(start_date)
+    end_dt = pandas.to_datetime(end_date) + pandas.Timedelta(days=1) - pandas.Timedelta(seconds=1)
+
+    df = dfMain[(dfMain["CheckInTime"] >= start_dt) & (dfMain["CheckInTime"] <= end_dt)].copy()
+
+    fig_clinic = GetTimeSeriesFig(
+        df_src=df,
+        category_col="ClinicName",
+        title="Atenciones por día — top clínicas en el rango",
+        topn=8,
+    )
+
+    fig_admit = GetTimeSeriesFig(
+        df_src=df,
+        category_col="AdmitSource",
+        title="Atenciones por día — top orígenes de admisión en el rango",
+        topn=8,
+    )
+
+    return fig_clinic, fig_admit
+
 
 
 @app.callback(
@@ -368,14 +486,14 @@ def CalculateWaitTimeMinStats(sel_clinics, sel_admits, sel_depts, start_date, en
         if len(s) > MAX_CATEGORIES:
             s = s.head(MAX_CATEGORIES)
         fig = px.pie(s, names=col, values="Count", title=titulo, template="plotly_dark")
-        fig.update_traces(textposition="inside") 
+        fig.update_traces(textposition="inside")
         fig.update_layout(
-            plot_bgcolor="#222831", 
-            paper_bgcolor="#393E46",  # gris más claro
+            plot_bgcolor="#222831",
+            paper_bgcolor="#393E46",  
         )
         return fig
 
-    # --------- Figuras ---------
+    
     fig_admit = pie_count(df, "AdmitSource", "Atenciones por orígenes de admisión")
     fig_clinic = pie_count(df, "ClinicName", "Atenciones por Clinic Name")
     fig_dept = pie_count(df, "Department", "Atenciones por Department")
